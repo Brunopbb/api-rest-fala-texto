@@ -59,8 +59,19 @@
         const audioFilesInput = document.getElementById('audioFiles');
         const messageDiv = document.getElementById('message');
 
+        const allowedExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'];
+
         // Habilitar o botão de envio quando 1-5 arquivos forem selecionados
         audioFilesInput.addEventListener('change', () => {
+
+
+            for(let i = 0; i < files.length; i++){
+                const filesExtension = files[i].name.split('.').pop().toLowerCase();
+                if (!allowedExtensions.includes(fileExtension)) {
+                    continue;
+                }
+            }
+
             if (audioFilesInput.files.length > 0 && audioFilesInput.files.length <= 10) {
                 uploadButton.disabled = false;
             } else {

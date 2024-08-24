@@ -14,7 +14,6 @@ load_dotenv()
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS_PATH")
 firebase_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
 
-accept_extensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a']
 
 if firebase_credentials:
     firebase_credentials_dict = json.loads(firebase_credentials)
@@ -25,8 +24,6 @@ if firebase_credentials:
 
 bucket = storage.bucket()
 
-def validation_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in accept_extensions
 
 @app.route('/')
 def home():
@@ -45,7 +42,7 @@ def upload_audio():
     uploaded_files_urls = []
 
     for audio_file in audio_files:
-        if audio_file.filename == "" and not validation_file(audio_file):
+        if audio_file.filename == "":
             continue
         
         blob = bucket.blob(audio_file.filename)
