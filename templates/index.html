@@ -64,10 +64,13 @@
         // Habilitar o botão de envio quando 1-5 arquivos forem selecionados
         audioFilesInput.addEventListener('change', () => {
 
+            const files = audioFilesInput.files;
+            
 
             for(let i = 0; i < files.length; i++){
                 const filesExtension = files[i].name.split('.').pop().toLowerCase();
                 if (!allowedExtensions.includes(fileExtension)) {
+
                     continue;
                 }
             }
