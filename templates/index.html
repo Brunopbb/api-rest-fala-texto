@@ -66,6 +66,8 @@
             } else {
                 uploadButton.disabled = true;
             }
+
+            
         });
 
         // Função para enviar os arquivos de áudio
@@ -76,6 +78,7 @@
             messageDiv.textContent = "Audios sendo enviados, Aguarde..."
 
             for (let i = 0; i < audioFiles.length; i++) {
+                
                 formData.append('audios', audioFiles[i]);
             }
 

@@ -14,6 +14,8 @@ load_dotenv()
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS_PATH")
 firebase_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
 
+accept_extensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a']
+
 if firebase_credentials:
     firebase_credentials_dict = json.loads(firebase_credentials)
     cred = credentials.Certificate(firebase_credentials_dict)
@@ -22,6 +24,9 @@ if firebase_credentials:
 })
 
 bucket = storage.bucket()
+
+def validation_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1] in accept_extensions
 
 @app.route('/')
 def home():
@@ -42,12 +47,13 @@ def upload_audio():
     for audio_file in audio_files:
         if audio_file.filename == "":
             continue
+        if validation_file(audio_file):
 
-        blob = bucket.blob(audio_file.filename)
-        blob.upload_from_file(audio_file)
-        blob.make_public()
+            blob = bucket.blob(audio_file.filename)
+            blob.upload_from_file(audio_file)
+            blob.make_public()
 
-        uploaded_files_urls.append(blob.public_url)
+            uploaded_files_urls.append(blob.public_url)
 
     return jsonify({"Mensagem": "Audios recebidos"}), 200
 
