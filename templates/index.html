@@ -60,22 +60,20 @@
         const messageDiv = document.getElementById('message');
 
         const allowedExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'];
-
-        // Habilitar o botão de envio quando 1-5 arquivos forem selecionados
+    
         audioFilesInput.addEventListener('change', () => {
 
             const files = audioFilesInput.files;
             let allFilesValid = true;
 
-            console.log("Arquivos selecionados:", files); // Depuração: Exibir arquivos selecionados
 
             for (let i = 0; i < files.length; i++) {
                 const fileExtension = files[i].name.split('.').pop().toLowerCase();
-                console.log(`Verificando o arquivo ${files[i].name}: extensão ${fileExtension}`); // Depuração: Exibir extensão do arquivo
+                
 
                 if (!allowedExtensions.includes(fileExtension)) {
                     allFilesValid = false;
-                    console.log(`Arquivo inválido encontrado: ${files[i].name}`); // Depuração: Exibir arquivos inválidos
+                    
                     break;
                 }
             }
@@ -83,17 +81,17 @@
             if (allFilesValid && files.length > 0 && files.length <= 10) {
                 uploadButton.disabled = false;
                 messageDiv.textContent = '';
-                console.log("Todos os arquivos são válidos. Botão de upload ativado."); // Depuração: Confirmar ativação do botão
+                
             } else if (!allFilesValid) {
                 uploadButton.disabled = true;
                 messageDiv.textContent = 'Algum arquivo selecionado não é um formato de áudio permitido.';
                 messageDiv.style.color = 'red';
-                console.log("Arquivos inválidos detectados. Botão de upload desativado."); // Depuração: Confirmar desativação do botão
+                
             } else {
                 uploadButton.disabled = true;
                 messageDiv.textContent = 'Por favor, selecione até 10 arquivos de áudio.';
                 messageDiv.style.color = 'red';
-                console.log("Número incorreto de arquivos. Botão de upload desativado."); // Depuração: Número incorreto de arquivos
+                
             }
         });
 
