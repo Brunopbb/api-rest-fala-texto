@@ -45,15 +45,14 @@ def upload_audio():
     uploaded_files_urls = []
 
     for audio_file in audio_files:
-        if audio_file.filename == "":
+        if audio_file.filename == "" and validation_file(audio_file):
             continue
-        if validation_file(audio_file):
+        
+        blob = bucket.blob(audio_file.filename)
+        blob.upload_from_file(audio_file)
+        blob.make_public()
 
-            blob = bucket.blob(audio_file.filename)
-            blob.upload_from_file(audio_file)
-            blob.make_public()
-
-            uploaded_files_urls.append(blob.public_url)
+        uploaded_files_urls.append(blob.public_url)
 
     return jsonify({"Mensagem": "Audios recebidos"}), 200
 
