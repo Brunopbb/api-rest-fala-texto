@@ -73,7 +73,6 @@
 
                 if (!allowedExtensions.includes(fileExtension)) {
                     allFilesValid = false;
-                    
                     break;
                 }
             }
@@ -101,6 +100,7 @@
             const formData = new FormData();
 
             messageDiv.textContent = "Audios sendo enviados, Aguarde..."
+            messageDiv.style.color = 'yellow'
 
             for (let i = 0; i < audioFiles.length; i++) {
                 
