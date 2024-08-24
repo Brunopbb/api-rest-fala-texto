@@ -65,20 +65,27 @@
         audioFilesInput.addEventListener('change', () => {
 
             const files = audioFilesInput.files;
-            
+            let allFilesValid = true;
 
             for(let i = 0; i < files.length; i++){
                 const filesExtension = files[i].name.split('.').pop().toLowerCase();
                 if (!allowedExtensions.includes(fileExtension)) {
-
+                    allFilesValid = false
                     continue;
                 }
             }
 
-            if (audioFilesInput.files.length > 0 && audioFilesInput.files.length <= 10) {
+            if (allFilesValid && files.length > 0 && files.length <= 10) {
                 uploadButton.disabled = false;
+                messageDiv.textContent = '';
+            } else if (!allFilesValid) {
+                uploadButton.disabled = true;
+                messageDiv.textContent = 'Algum arquivo selecionado não é um formato de áudio permitido.';
+                messageDiv.style.color = 'red';
             } else {
                 uploadButton.disabled = true;
+                messageDiv.textContent = 'Por favor, selecione até 10 arquivos de áudio.';
+                messageDiv.style.color = 'red';
             }
 
             
