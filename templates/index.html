@@ -73,6 +73,8 @@
             const audioFiles = audioFilesInput.files;
             const formData = new FormData();
 
+            messageDiv.textContent = "Audios sendo enviados, Aguarde..."
+
             for (let i = 0; i < audioFiles.length; i++) {
                 formData.append('audios', audioFiles[i]);
             }
