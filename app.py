@@ -45,7 +45,7 @@ def upload_audio():
     uploaded_files_urls = []
 
     for audio_file in audio_files:
-        if audio_file.filename == "" and validation_file(audio_file):
+        if audio_file.filename == "" and not validation_file(audio_file):
             continue
         
         blob = bucket.blob(audio_file.filename)
