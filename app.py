@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask import render_template
 from dotenv import load_dotenv
+import json
 import firebase_admin
 from firebase_admin import credentials, storage
 from flask_cors import CORS
@@ -13,8 +14,10 @@ load_dotenv()
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS_PATH")
 firebase_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
 
-cred = credentials.Certificate(firebase_credentials)
-firebase_admin.initialize_app(cred, {
+if firebase_credentials:
+    firebase_credentials_dict = json.loads(firebase_credentials)
+    cred = credentials.Certificate(firebase_credentials_dict)
+    firebase_admin.initialize_app(cred, {
     'storageBucket' : firebase_bucket
 })
 
