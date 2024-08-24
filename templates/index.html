@@ -71,7 +71,7 @@
                 const filesExtension = files[i].name.split('.').pop().toLowerCase();
                 if (!allowedExtensions.includes(fileExtension)) {
                     allFilesValid = false
-                    continue;
+                    break;
                 }
             }
 
