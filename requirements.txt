@@ -2,4 +2,3 @@ Flask==2.3.3
 python-dotenv==1.0.1
 firebase_admin==6.5.0
 flask_cors==4.0.1
-json==19.2.1
