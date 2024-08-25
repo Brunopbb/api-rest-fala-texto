@@ -1,16 +1,15 @@
 from flask import Flask, request, jsonify
 from flask import render_template
-from dotenv import load_dotenv
-import json
 import firebase_admin
 from firebase_admin import credentials, storage
 from flask_cors import CORS
 import os
+import json
 
 app = Flask(__name__)
 CORS(app)
 
-load_dotenv()
+
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS_PATH")
 firebase_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
 
