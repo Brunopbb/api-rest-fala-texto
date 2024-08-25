@@ -42,9 +42,10 @@ def upload_audio():
 
     try:
         exists_dataset = load_dataset(huggingface_id, split="train")
-        
+        exists_transcriptions = set(exists_dataset['transcription'])
     except FileNotFoundError:
-        exits_dataset = None
+        exists_dataset = None
+        exists_transcriptions = set()
     
     data = {
             'audio': [],
@@ -52,7 +53,7 @@ def upload_audio():
         }
     
     for audio_file, text in zip(audio_files, transcriptions):
-        if audio_file.filename == "":
+        if audio_file.filename == "" or text in exists_transcriptions:
             continue
     
         audio_data = audio_file.read()
