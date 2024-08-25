@@ -1,27 +1,26 @@
 from flask import Flask, request, jsonify
 from flask import render_template
-import firebase_admin
-from firebase_admin import credentials, storage
+from huggingface_hub import login
+from datasets import DatasetDict, Dataset, Audio, load_dataset, concatenate_datasets
 from flask_cors import CORS
+from dotenv import load_dotenv
 import os
 import json
+import io
+import soundfile as sf
+
+from data_process import *
+
 
 app = Flask(__name__)
 CORS(app)
 
+load_dotenv()
+huggingface_token = os.getenv("HUGGINGFACE_TOKEN")
+huggingface_id = os.getenv("HUGGINGFACE_REPO_ID")
 
-firebase_credentials = os.getenv("FIREBASE_CREDENTIALS_PATH")
-firebase_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
+login("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")
 
-
-if firebase_credentials:
-    firebase_credentials_dict = json.loads(firebase_credentials)
-    cred = credentials.Certificate(firebase_credentials_dict)
-    firebase_admin.initialize_app(cred, {
-    'storageBucket' : firebase_bucket
-})
-
-bucket = storage.bucket()
 
 
 @app.route('/')
@@ -34,21 +33,51 @@ def upload_audio():
         return jsonify({"Error": "Nehnum arquivo foi enviado"}), 400
     
     audio_files = request.files.getlist("audios")
+    transcriptions = get_transcription(audio_files)
 
     if len(audio_files) == 0 or len(audio_files) > 10:
         jsonify({"Error": "Envie apenas 10 audios por vez"}), 400
 
-    uploaded_files_urls = []
+    exists_dataset = ''
 
-    for audio_file in audio_files:
+    try:
+        exists_dataset = load_dataset(huggingface_id, split="train")
+        
+    except FileNotFoundError:
+        exits_dataset = None
+    
+    data = {
+            'audio': [],
+            'transcription': []
+        }
+    
+    for audio_file, text in zip(audio_files, transcriptions):
         if audio_file.filename == "":
             continue
-        
-        blob = bucket.blob(audio_file.filename)
-        blob.upload_from_file(audio_file)
-        blob.make_public()
+    
+        audio_data = audio_file.read()
 
-        uploaded_files_urls.append(blob.public_url)
+        audio = AudioSegment.from_file(io.BytesIO(audio_data))
+    
+        wav_io = io.BytesIO()
+        audio.export(wav_io, format="wav")
+        wav_io.seek(0)
+        samples, sample_rate = sf.read(wav_io)
+        
+        data["audio"].append({"array": samples, "sampling_rate": sample_rate})
+        data["transcription"].append(text)
+        
+    dataset = Dataset.from_dict(data)
+    dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
+
+
+    if exists_dataset:
+        new_data = concatenate_datasets([exists_dataset, dataset])
+    else:
+        new_data = dataset
+
+    new_data.push_to_hub(huggingface_id)
+        
 
     return jsonify({"Mensagem": "Audios recebidos"}), 200
 
