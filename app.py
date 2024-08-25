@@ -19,7 +19,7 @@ load_dotenv()
 huggingface_token = os.getenv("HUGGINGFACE_TOKEN")
 huggingface_id = os.getenv("HUGGINGFACE_REPO_ID")
 
-login("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")
+login(huggingface_token)
 
 
 
