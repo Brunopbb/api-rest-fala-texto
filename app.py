@@ -5,9 +5,9 @@ from datasets import DatasetDict, Dataset, Audio, load_dataset, concatenate_data
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-import json
 import io
 import soundfile as sf
+from pydub import AudioSegment
 
 from data_process import *
 
@@ -38,7 +38,7 @@ def upload_audio():
     if len(audio_files) == 0 or len(audio_files) > 10:
         jsonify({"Error": "Envie apenas 10 audios por vez"}), 400
 
-    exists_dataset = ''
+    exists_dataset = None
 
     try:
         exists_dataset = load_dataset(huggingface_id, split="train")
