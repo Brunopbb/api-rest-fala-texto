@@ -41,8 +41,11 @@ def upload_audio():
     exists_dataset = None
 
     try:
-        exists_dataset = load_dataset(huggingface_id, split="train")
-        exists_transcriptions = set(exists_dataset['transcription'])
+        exists_dataset = load_dataset(huggingface_id)
+        exists_transcriptions_train = set(exists_dataset['train']['transcription'])
+        exists_transcriptions_test = set(exists_dataset['test']['transcription'])
+        exists_transcriptions = exists_transcriptions_train.union(exists_transcriptions_test)
+
     except FileNotFoundError:
         exists_dataset = None
         exists_transcriptions = set()
@@ -67,17 +70,37 @@ def upload_audio():
         
         data["audio"].append({"array": samples, "sampling_rate": sample_rate})
         data["transcription"].append(text)
-        
-    dataset = Dataset.from_dict(data)
-    dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
+
+    if data['audio']:
+        dataset = Dataset.from_dict(data)
+        dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
 
 
-    if exists_dataset:
-        new_data = concatenate_datasets([exists_dataset, dataset])
-    else:
-        new_data = dataset
+        if exists_dataset:
+            if len(dataset >= 2):
+                train_test_split = dataset.train_test_split(test_size=0.2)
+                combined_train = concatenate_datasets(train_test_split['train'], train_test_split['train'])
+                combined_test = concatenate_datasets(train_test_split['test'], train_test_split['test'])
+            else:
+                combined_train = concatenate_datasets([exists_dataset['train'], dataset])
+                combined_test = exists_dataset['test']
+        else:
+            if len(dataset >= 2):
+                train_test_split = dataset.train_test_split(test_size=0.2)
+                combined_train = train_test_split['train']
+                combined_test = train_test_split['test']
+            else:
+                combined_train = dataset
+                combined_test = Dataset.from_dict({'audio': [], 'transcription': []})
 
-    new_data.push_to_hub(huggingface_id)
+
+        dataset_dict = DatasetDict({
+
+            "train": combined_train,
+            "test": combined_test
+        })
+
+        dataset_dict.push_to_hub(huggingface_id)
         
 
     return jsonify({"Mensagem": "Audios recebidos"}), 200
