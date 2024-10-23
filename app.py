@@ -67,6 +67,9 @@ def upload_audio():
         audio.export(wav_io, format="wav")
         wav_io.seek(0)
         samples, sample_rate = sf.read(wav_io)
+
+        if len(samples.shape) > 1:
+            samples = samples.mean(axis=1)
         
         data["audio"].append({"array": samples, "sampling_rate": sample_rate})
         data["transcription"].append(text)
@@ -77,15 +80,15 @@ def upload_audio():
 
 
         if exists_dataset:
-            if len(dataset >= 2):
+            if len(dataset) >= 2:
                 train_test_split = dataset.train_test_split(test_size=0.2)
-                combined_train = concatenate_datasets(train_test_split['train'], train_test_split['train'])
-                combined_test = concatenate_datasets(train_test_split['test'], train_test_split['test'])
+                combined_train = concatenate_datasets([train_test_split['train'], exists_dataset['train']])
+                combined_test = concatenate_datasets([train_test_split['test'], exists_dataset['test']])
             else:
                 combined_train = concatenate_datasets([exists_dataset['train'], dataset])
                 combined_test = exists_dataset['test']
         else:
-            if len(dataset >= 2):
+            if len(dataset) >= 2:
                 train_test_split = dataset.train_test_split(test_size=0.2)
                 combined_train = train_test_split['train']
                 combined_test = train_test_split['test']
